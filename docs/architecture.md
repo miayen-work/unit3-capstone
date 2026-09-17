@@ -75,7 +75,72 @@ RDS instance (`unit3-capstone-db`), Redshift cluster
 (`unit3-capstone-redshift`), OpenSearch domain
 (`unit3-capstone-search`).
 
+## AI query layer status (as of 2026-09-17)
+
+The AI query layer is fully built (`ai_query_layer/router.py`,
+`document_qa.py`, `nl_to_sql.py`, `query_engine.py`) but currently
+**blocked from running** by an account-level issue, not a code issue:
+
+```
+AccessDeniedException: Model access is denied due to IAM user or service role is not
+authorized to perform the required AWS Marketplace actions (aws-marketplace:ViewSubscriptions,
+aws-marketplace:Subscribe) to enable access to this model.
+```
+
+This is confirmed to be an account/permissions problem, not a bug:
+the exact same error occurs calling `InvokeModel` via boto3 **and**
+through the Bedrock console's own "Open in playground" feature, using
+the same IAM identity. This same call succeeded earlier in the project
+(see `boto3_scripts/test_bedrock.py`'s original successful run), so
+access was revoked or lapsed on the account side afterward. Flagged to
+course staff; the fix (granting the two AWS Marketplace permissions, or
+subscribing the account to the model) needs to happen outside this
+codebase.
+
+Everything upstream of Bedrock is built, tested, and confirmed working:
+S3, Lambda/Textract, RDS, OpenSearch, Glue Catalog, Redshift, the SQL
+validator (7/7 test cases, see `docs/sql_validation_results.txt`), and
+the charts. The AI query layer's logic is ready to run the moment
+access is restored -- expected behavior for the two required harder
+queries is documented below, based on the known test data, and will be
+replaced with actual captured output once Bedrock access works.
+
+## Expected behavior: harder synthesis queries
+
+**Query 1**: *"Does our current customer churn rate (from the data
+warehouse) align with what our documented retention strategy says we
+should be seeing?"*
+
+- Router should classify this as `"both"` (needs Redshift + OpenSearch).
+- SQL path: a query against `customers` computing churn rate returns
+  **6 churned / 50 total = 12%**.
+- Document path: `retention_strategy.pdf` states a target of **"below
+  5%, healthy range 2-4%"**, and that anything at/above 5% "should
+  trigger an immediate retention review."
+- Expected combined answer: churn rate (12%) does **not** align with
+  the documented target -- it is well above the 5% threshold that
+  should trigger a retention review, citing both the `customers` table
+  result and `retention_strategy.pdf`.
+
+**Query 2**: *"Based on our data governance policy documents, are any
+of the currently-ingested datasets missing required metadata fields
+(check against the Glue Catalog)?"*
+
+- Router should classify this as `"both"` (needs Glue/Redshift schema +
+  OpenSearch).
+- Document path: `data_governance_policy.pdf` requires 5 fields on every
+  dataset: a unique identifier, `source_system`, `data_owner`,
+  `created_at`, `last_updated_at`.
+- Schema path: the Glue Catalog (`unit3_capstone_db`) shows `customers`
+  has columns `customer_id, signup_date, plan_type, monthly_spend,
+  churned, churn_date` -- missing `source_system`, `data_owner`, and
+  `last_updated_at`. `product_inventory` has all 5 required fields.
+- Expected combined answer: **yes** -- `customers` is missing 3 required
+  governance fields (`source_system`, `data_owner`, `last_updated_at`),
+  while `product_inventory` is fully compliant, citing both the policy
+  document and the Glue Catalog schema.
+
 ## Test results
 
-_Fill in after end-to-end testing (Day 4), including both required harder
-synthesis queries and their citations._
+_To be filled in with actual captured output once Bedrock access is
+restored -- see "AI query layer status" above._

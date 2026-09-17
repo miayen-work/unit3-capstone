@@ -6,23 +6,32 @@ SQL (Redshift), with a Bedrock/Claude-powered natural-language query layer.
 
 ## Status
 
-Bronze checklist (see full list in `docs/requirements.md`):
+Bronze checklist:
 
-- [ ] S3 stores raw PDFs, CSVs, and JSONs
-- [ ] Lambda triggers on upload; calls Textract for PDFs
-- [ ] Textract extracts and chunks PDF text (500-1000 tokens)
-- [ ] Sentence Transformers generates document embeddings
-- [ ] Raw text stored in RDS; embeddings in OpenSearch
-- [ ] Glue Crawler catalogs and discovers data schemas
-- [ ] Glue ETL normalizes, validates, and loads CSV/JSON into Redshift
-- [ ] Redshift consolidates structured and vector data
-- [ ] Matplotlib charts (2+) visualize Redshift data
-- [ ] Lambda and boto3 automate flows
-- [ ] IAM secures resources
-- [ ] AI query layer: routing, NL-to-SQL, contextual document response
-- [ ] SQL validation layer implemented and tested (5+ cases)
-- [ ] Tokenomics logging + 10-query cost summary
-- [ ] Both harder synthesis queries answered, citing both sources
+- [x] S3 stores raw PDFs, CSVs, and JSONs
+- [x] Lambda triggers on upload; calls Textract for PDFs
+- [x] Textract extracts and chunks PDF text (500-1000 tokens, word-count proxy)
+- [x] Sentence Transformers generates document embeddings
+- [x] Raw text stored in RDS; embeddings in OpenSearch
+- [x] Glue Crawler catalogs and discovers data schemas (adapted: crawler creation is
+      denied in this sandbox account, so schemas are defined directly via boto3 --
+      see `docs/architecture.md`)
+- [x] Glue ETL normalizes, validates, and loads CSV/JSON into Redshift
+- [x] Redshift consolidates structured data (vector embeddings live in OpenSearch)
+- [x] Matplotlib charts (2+) visualize Redshift data -- see `charts/`
+- [x] Lambda and boto3 automate flows
+- [x] IAM secures resources (scoped-down/inline policies throughout; see
+      `docs/architecture.md` for documented tradeoffs)
+- [ ] AI query layer: routing, NL-to-SQL, contextual document response --
+      **code complete, blocked on a Bedrock model-access permission issue
+      outside this codebase; see `docs/architecture.md`**
+- [x] SQL validation layer implemented and tested (7/7 cases, including a
+      stacked-query attack) -- see `docs/sql_validation_results.txt`
+- [ ] Tokenomics logging + 10-query cost summary -- logging is implemented
+      (`tokenomics/tracker.py`), blocked on the same Bedrock access issue
+- [ ] Both harder synthesis queries answered, citing both sources --
+      expected behavior documented in `docs/architecture.md`, pending
+      Bedrock access to capture actual output
 
 ## Project layout
 
