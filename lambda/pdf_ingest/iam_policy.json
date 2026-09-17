@@ -1,0 +1,26 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "TextractAccess",
+            "Effect": "Allow",
+            "Action": [
+                "textract:StartDocumentTextDetection",
+                "textract:GetDocumentTextDetection"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "S3ReadDocuments",
+            "Effect": "Allow",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::unit3-capstone-miayen-docs/*"
+        },
+        {
+            "Sid": "S3WriteChunks",
+            "Effect": "Allow",
+            "Action": "s3:PutObject",
+            "Resource": "arn:aws:s3:::unit3-capstone-miayen-docs/chunks/*"
+        }
+    ]
+}

@@ -1,5 +1,7 @@
 venv/
 __pycache__/
+lambda/pdf_ingest/package/
+lambda/pdf_ingest/function.zip
 *.pyc
 .env
 data/*.pdf
