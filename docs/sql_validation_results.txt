@@ -1,0 +1,9 @@
+[PASS] valid=1     expected=1     reason='OK'                                          query='SELECT * FROM customers WHERE churned = true'
+[PASS] valid=1     expected=1     reason='OK'                                          query='select id, name from orders limit 10'
+[PASS] valid=0     expected=0     reason='Blocked: DROP not permitted'                 query='DROP TABLE customers'
+[PASS] valid=0     expected=0     reason='Blocked: DROP not permitted'                 query='SELECT * FROM customers; DROP TABLE customers;'
+[PASS] valid=0     expected=0     reason='Blocked: UPDATE not permitted'               query='UPDATE customers SET churned = false'
+[PASS] valid=0     expected=0     reason='Blocked: INSERT not permitted'               query="INSERT INTO customers VALUES (1, 'test')"
+[PASS] valid=1     expected=1     reason='OK'                                          query='SELECT * FROM information_schema.tables'
+
+7/7 passed
