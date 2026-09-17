@@ -1,0 +1,13 @@
+[PASS] extract_json: plain JSON
+[PASS] extract_json: JSON with surrounding text
+[PASS] extract_json: JSON in markdown code fence
+[PASS] extract_json: raises on missing JSON
+[PASS] strip_code_fence: plain query
+[PASS] strip_code_fence: trailing semicolon removed
+[PASS] strip_code_fence: markdown fence with language tag
+[PASS] strip_code_fence: markdown fence no language tag
+[PASS] execute_sql: rejects DROP before connecting
+[PASS] execute_sql: rejects stacked query before connecting
+[PASS] execute_sql: rejects UPDATE before connecting
+
+11/11 passed

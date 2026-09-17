@@ -1,8 +1,40 @@
 # Architecture
 
-_To be filled in once the reference architecture diagram is provided in class._
+_No reference diagram was provided in class before the deadline; the
+diagram below documents the actual as-built architecture._
 
-## Data flow (fill in / adjust once diagram is available)
+```mermaid
+flowchart TD
+    Upload([Document/file upload]) --> S3[(S3 Bucket)]
+
+    S3 -->|PDF create event| Lambda[Lambda: pdf_ingest]
+    Lambda -->|Textract extract + chunk| RDS[(RDS: document_chunks)]
+    Lambda -->|chunk JSON| S3chunks[S3: chunks/ prefix]
+    S3chunks -->|local script| Embed[Sentence Transformers]
+    Embed -->|vectors| OpenSearch[(OpenSearch: documents index)]
+
+    S3 -->|CSV/JSON| GlueCatalog[Glue Data Catalog]
+    GlueCatalog --> GlueETL[Glue ETL job]
+    GlueETL -->|normalize + validate| Redshift[(Redshift: customers, product_inventory)]
+
+    User([User question]) --> Router[Router - Claude/Bedrock]
+    Router -->|opensearch| DocQA[Document Q&A]
+    Router -->|redshift| NL2SQL[NL-to-SQL]
+    Router -->|both| Combine[Combined answer - Claude/Bedrock]
+
+    DocQA -->|semantic search| OpenSearch
+    NL2SQL --> Validator[SQL Validator]
+    Validator -->|SELECT-only| Redshift
+    Combine --> OpenSearch
+    Combine --> Redshift
+
+    Router -.->|logs every call| Tokenomics[Tokenomics tracker]
+    DocQA -.-> Tokenomics
+    NL2SQL -.-> Tokenomics
+    Combine -.-> Tokenomics
+```
+
+## Data flow
 
 1. Upload -> S3 (raw PDFs, CSVs, JSONs)
 2. S3 event -> Lambda

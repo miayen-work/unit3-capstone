@@ -24,7 +24,10 @@ Bronze checklist:
       `docs/architecture.md` for documented tradeoffs)
 - [ ] AI query layer: routing, NL-to-SQL, contextual document response --
       **code complete, blocked on a Bedrock model-access permission issue
-      outside this codebase; see `docs/architecture.md`**
+      outside this codebase; see `docs/architecture.md`**. Logic that
+      doesn't require a live model call (JSON parsing, SQL cleanup, the
+      validator gate inside SQL execution) is unit tested independently
+      -- 11/11 passing, see `docs/ai_query_layer_logic_test_results.txt`
 - [x] SQL validation layer implemented and tested (7/7 cases, including a
       stacked-query attack) -- see `docs/sql_validation_results.txt`
 - [ ] Tokenomics logging + 10-query cost summary -- logging is implemented
